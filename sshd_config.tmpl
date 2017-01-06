@@ -1,0 +1,52 @@
+# Only SSH2
+Protocol 2
+
+# Standard Port
+Port 22
+
+# Allowed Host Keys
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Privilege Separation and Strict File Permissions
+UsePrivilegeSeparation yes
+StrictModes yes
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Client Authentication
+AllowGroups ssh-user
+AuthorizedKeysFile %h/.ssh/authorized_keys
+ChallengeResponseAuthentication no
+HostbasedAuthentication no
+LoginGraceTime 120
+PasswordAuthentication no
+PermitEmptyPasswords no
+PermitRootLogin yes
+PubkeyAuthentication yes
+UsePAM no
+
+# Algorithms
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
+
+# X11
+X11Forwarding no
+
+# Motd
+PrintMotd no
+PrintLastLog yes
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# Allow SFTP Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Keep Alive
+ClientAliveInterval 120
+ClientAliveCountMax 2
+TCPKeepAlive yes

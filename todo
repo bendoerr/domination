@@ -1,0 +1,4 @@
+* update fail2ban to use permanent ban
+* update tripwire to ignore inode changes in log dir
+* install blacklist script
+* setup cron to update blacklist
