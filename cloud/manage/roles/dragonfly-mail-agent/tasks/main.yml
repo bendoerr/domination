@@ -1,0 +1,32 @@
+# vim:ft=ansible :
+#
+# Ansible role to install Dragonfly Mail Agent
+#
+
+---
+
+- name:     check if dma is installed
+  register: dma_installed
+
+  failed_when:   "{{ dma_installed.rc > 1 }}"
+  changed_when:  "{{ dma_installed.rc == 1 }}"
+  ignore_errors: yes
+
+  command: dpkg --status {{ dma_package_name }}
+
+- name:    install dma
+  include: install.yml
+  static:  no
+
+  when: "{{ dma_installed.rc == 1 }}"
+
+- name: configure dma
+
+  template:
+    backup: yes
+    dest:   /etc/dma/dma.conf
+    group:  root
+    mode:   u=rw,g=r,o=r
+    owner:  root
+    src:    etc/dma/dma.conf.j2
+

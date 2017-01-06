@@ -1,0 +1,51 @@
+---
+
+- name: provide debconf database for tripwire
+
+  template:
+    dest:  /run/shm/tripwire-debconf-config.dat
+    mode:  0600
+    owner: root
+    src:   tripwire-debconf-config.dat.j2
+
+
+- name: ensure tripwire is installed
+
+  environment:
+    DEBCONF_DB_FALLBACK: "File{/run/shm/tripwire-debconf-config.dat}"
+    hostname: "{{ inventory_hostname_short }}"
+
+  apt:
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+    name:             tripwire
+    state:            present
+
+  notify:
+    - set local-keyfile password
+    - set site-keyfile password
+    - generate tripwire config db
+    - generate tripwire policy db
+    - init tripwire database
+
+
+- name: configure tripwire
+
+  copy:
+    src: twcfg.txt
+    dest: /etc/tripwire/twcfg.txt
+    backup: yes
+
+  notify:
+    - generate tripwire config db
+
+
+- name: update tripwire policy file
+
+  copy:
+    src: twpol.txt
+    dest: /etc/tripwire/twpol.txt
+    backup: yes
+
+  notify:
+    - generate tripwire policy db
+    - init tripwire database

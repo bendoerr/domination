@@ -1,0 +1,26 @@
+---
+
+fail2ban_ignoreip: 127.0.0.1/8
+fail2ban_ignorecommand:
+fail2ban_bantime: -1
+fail2ban_findtime: 3600
+fail2ban_maxretry: 3
+fail2ban_backend: auto
+fail2ban_usedns: warn
+fail2ban_logencoding: auto
+fail2ban_enabled: false
+
+fail2ban_destemail: root@localhost
+fail2ban_sender: fail2ban@localhost
+fail2ban_mta: sendmail
+
+fail2ban_banaction: iptables-multiport
+fail2ban_action: action_mwl
+
+fail2ban_services:
+  - name: sshd
+    props:
+      enabled: true
+
+apt_cache_valid_time: 86400
+

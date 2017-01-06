@@ -1,0 +1,16 @@
+---
+- name: ensure hostname is set
+  hostname: name="{{ hostname }}"
+
+- name: re-gather facts
+  action: setup
+  when: ansible_hostname != fqdn
+
+- name: build hosts file
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^{{ ansible_default_ipv4.address }}'
+    line: '{{ ansible_default_ipv4.address }} {{ fqdn }} {{ hostname }}'
+    state: present
+    backup: yes
+  when: ansible_default_ipv4.address is defined

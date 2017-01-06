@@ -1,0 +1,19 @@
+---
+
+- name: ensure allowed_groups exists
+  when: "{{ sshd_allow_groups_enabled  }}"
+
+  with_items: "{{ sshd_allow_groups }}"
+
+  group:
+    name:  "{{ item }}"
+    state: present
+
+
+- name: ensure root is in allowed_groups
+  when: "{{ sshd_allow_groups_enabled  }}"
+
+  user:
+    name:   root
+    append: yes
+    groups: "{{ sshd_allow_groups }}"

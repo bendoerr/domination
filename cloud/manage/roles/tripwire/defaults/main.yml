@@ -1,0 +1,6 @@
+---
+cache_valid_time: 86400
+tripwire_local_password: ""
+tripwire_site_password: ""
+tripwire_local_password_tmp: "changeme"
+tripwire_site_password_tmp: "changeme"

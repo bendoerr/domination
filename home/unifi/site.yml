@@ -1,0 +1,73 @@
+#!/usr/bin/env ansible-playbook
+# vim:ft=ansible :
+#
+# Ansible playbook to configure Unifi Controller
+#
+
+---
+
+- name: ensure that the Unifi Controller is setup and running
+  hosts: "{{ target | default('all') }}"
+  gather_facts: no
+  become: yes
+
+  tasks:
+
+    - name:          check for python
+      register:      python_check
+      ignore_errors: yes
+
+      failed_when:  false
+      changed_when: python_check.rc != 0
+
+      raw: dpkg -s python-simplejson 2>&1 > /dev/null
+
+
+    - name: install python and simplejson
+
+      when: python_check | failed
+
+      raw: apt update && apt install -y python2.7 python-simplejson
+
+
+    - name: ensure package signing keys are present
+
+      with_items:
+        # Unifi Key
+        - C0A52C50
+        # MongoDB Key
+        - 7F0CEB10
+
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: "{{ item }}"
+
+
+    - name: ensure ubiquiti networks debian repo is present
+
+      with_items:
+        - { repo: "deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti", file: "100-ubnt" }
+        - { repo: "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", file: "200-mongo" }
+
+      apt_repository:
+        repo:         "{{ item.repo }}"
+        filename:     "{{ item.file }}"
+        state:        present
+        update_cache: yes
+
+
+    - name:   install unifi package
+      notify: restart unifi controller
+
+      apt:
+        name: unifi
+
+
+  handlers:
+
+    - name: restart unifi controller
+
+      service:
+        name:    unifi
+        state:   restarted
+        enabled: true

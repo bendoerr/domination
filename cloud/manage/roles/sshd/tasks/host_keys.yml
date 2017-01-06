@@ -1,0 +1,62 @@
+---
+
+- name: look for current sshd host keys
+  register: sshd_host_keys_found
+
+  find:
+    path:      "{{ sshd_path }}"
+    pattern:   "{{ sshd_host_key_pattern }}"
+    file_type: any
+
+
+- name: remove useless host keys
+  with_items:   "{{ sshd_host_keys_found.files }}"
+  loop_control:
+    label:      "{{ item.path | basename }}"
+
+  when: |
+    {{
+       sshd_host_key_force_regen
+       or ( sshd_host_key_types | selectattr('file', 'equalto', ( item.path | basename | replace(sshd_host_key_marker_prefix, '') | replace('.pub', '')) ) | first ) is undefined
+       or ( ( sshd_host_key_types | selectattr('file', 'equalto', ( item.path | basename | replace('.pub', '') ) ) | first ) is defined and not item.islnk )
+    }}
+
+  file:
+    path:  "{{ item.path }}"
+    state: absent
+
+
+- name: generate managed host keys
+  with_items: "{{ sshd_host_key_types }}"
+  loop_control:
+    label:    "{{ item.type }}"
+
+  command: |
+    ssh-keygen -t {{ item.type }} {{ item.extra }}
+               -N ''
+               -C {{ inventory_hostname }}
+               -f {{ sshd_path }}/{{ sshd_host_key_marker_prefix }}{{ item.file }}
+    creates={{ sshd_path }}/{{sshd_host_key_marker_prefix}}{{ item.file }}
+
+
+- name: link managed host private keys
+  with_items: "{{ sshd_host_key_types }}"
+  loop_control:
+    label:    "{{ item.type }}"
+
+  file:
+    path:  "{{ sshd_path }}/{{ item.file }}"
+    src:   "{{ sshd_path }}/{{sshd_host_key_marker_prefix}}{{ item.file }}"
+    state: link
+
+
+- name: link managed host public keys
+  with_items: "{{ sshd_host_key_types }}"
+  loop_control:
+    label:    "{{ item.type }}"
+
+  file:
+    path:  "{{ sshd_path }}/{{ item.file }}.pub"
+    src:   "{{ sshd_path }}/{{sshd_host_key_marker_prefix}}{{ item.file }}.pub"
+    state: link
+

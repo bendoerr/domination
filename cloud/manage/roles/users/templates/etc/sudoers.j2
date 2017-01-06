@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        mail_no_host
+Defaults        mail_no_perms
+Defaults        mail_no_user
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+Defaults        mailfrom="{{ users_sudoers_mailto }}"
+Defaults        mailto="{{ users_sudoers_mailto }}"
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+
+# Members of the admin group may gain root privileges
+{% for group in users_sudoers_groups %}
+%{{ group }} ALL=(ALL) ALL
+{% endfor %}
+
+#includedir /etc/sudoers.d
+

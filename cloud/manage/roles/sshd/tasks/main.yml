@@ -1,0 +1,20 @@
+---
+
+- name:    manage host keys
+  include: host_keys.yml
+
+- name:    manage ssh users
+  include: users.yml
+
+- name:   ensure sshd_config is hardened
+  notify: reload sshd
+
+  template:
+    backup:   yes
+    dest:     /etc/ssh/sshd_config
+    group:    0
+    mode:     0644
+    owner:    0
+    src:      etc/ssh/sshd_config.j2
+    validate: /usr/sbin/sshd -t -f %s
+

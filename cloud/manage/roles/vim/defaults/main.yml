@@ -1,0 +1,6 @@
+---
+
+vim_vimrc_path: /etc/vim/vimrc
+vim_bundle_path: /etc/vim/bundles
+
+apt_cache_valid_time: 86400

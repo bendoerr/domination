@@ -1,0 +1,33 @@
+---
+
+sshd_path: /etc/ssh
+
+sshd_host_key_marker_prefix: managed_
+sshd_host_key_pattern: "*ssh_host_*_key*"
+sshd_host_key_force_regen: no
+
+sshd_host_key_types:
+  - type: rsa
+    file: ssh_host_rsa_key
+    extra: -b 4069
+
+  - type: ed25519
+    file: ssh_host_ed25519_key
+    extra:
+
+sshd_ciphers:
+  - chacha20-poly1305@openssh.com
+  - aes256-gcm@openssh.com
+
+sshd_kex_algos:
+  - curve25519-sha256@libssh.org
+
+sshd_macs:
+  - hmac-sha2-512-etm@openssh.com
+  - hmac-sha2-256-etm@openssh.com
+
+sshd_permit_root_login: "yes"
+
+sshd_allow_groups_enabled: yes
+sshd_allow_groups: ['ssh-user']
+

@@ -1,0 +1,67 @@
+---
+
+- name: configure sudoers
+
+  template:
+    backup: yes
+    dest: /etc/sudoers
+    src: etc/sudoers.j2
+    validate: visudo -cf %s
+
+
+- name: create groups
+
+  with_items:   "{{ users_groups }}"
+  loop_control:
+    label:      "{{ item.name }}"
+
+  group:
+    name:   "{{ item.name }}"
+    system: "{{ item.system | default(omit) }}"
+
+- name: create users
+
+  with_items:   "{{ users_users }}"
+  loop_control:
+    label:      "{{ item.name }}"
+
+  user:
+    comment:    "{{ item.gecos | default(item.name) }}"
+    createhome: "{{ item.createhome | default('yes') }}"
+    group:      "{{ item.group | default(omit) }}"
+    groups:     "{{ item.groups | default([ ]) | join(',') | default(omit) }}"
+    name:       "{{ item.name }}"
+    password:   "{{ item.password | default(omit) }}"
+    shell:      "{{ item.shell | default('/bin/bash') }}"
+    state:      "{{ item.state | default('present') }}"
+
+
+- name: ensure home directory permissions
+
+  with_items:   "{{ users_users }}"
+  loop_control:
+    label:      "{{ item.name }}"
+
+  when: "{{ item.createhome | default(true) }}"
+
+  file:
+    group: "{{ item.group | default(omit) }}"
+    mode:  u=rwx
+    owner: "{{ item.name }}"
+    path:  "{{ item.home | default('/home/' ~ item.name) }}"
+    state: directory
+
+
+- name: update authorized_keys
+
+  with_items:   "{{ users_users }}"
+  loop_control:
+    label:      "{{ item.name }}"
+
+  authorized_key:
+    exclusive: yes
+    key:       "{{ item.authkeys | join('\n') }}"
+    user:      "{{ item.name }}"
+
+
+# TODO: Setup shell

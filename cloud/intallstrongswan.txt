@@ -1,0 +1,21 @@
+sudo apt install strongswan
+
+template /etc/ipsec.conf
+template /etc/ipsec.secrets
+restart
+
+in /etc/sysctl.conf
+uncomment net.ipv4.ip_forward = 1
+uncomment net.ipv4.conf.all.accept_redirects = 0
+uncomment net.ipv4.conf.all.send_redirects = 0
+
+then
+sysctl -p
+
+#todo maybe add dest to limit to 10.19/16
+sudo iptables -t nat -A POSTROUTING -s 172.0.0.0/8 -o eth1 -j MASQUERADE
+
+
+
+Then on each box need to add route to home
+sudo route add -net 172.0.0.0/8 gw 10.132.19.186

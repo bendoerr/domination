@@ -1,0 +1,55 @@
+#!/usr/bin/env ansible-playbook --ask-vault-pass
+# vim:ft=ansible :
+#
+# Ansible playbook to manage servers
+#
+
+---
+
+- name: ensure that server is setup and hardened
+  hosts: "{{ target | default('all') }}"
+  remote_user: root
+
+  vars:
+    admins_email: craftsman@bendoerr.me
+    sender_email: "{{ inventory_hostname_short }}@cloud.bendoerr.com"
+
+    dma_smarthost:  gateway.internal.cloud.bendoerr.com
+    dma_mailname:   "{{ inventory_hostname }}"
+    dma_masquerade: "{{ sender_email }}"
+
+    fail2ban_destemail: "{{ admins_email }}"
+    fail2ban_sender:    "{{ sender_email }}"
+
+    users_sudoers_mailto:   "{{ admins_email }}"
+    users_sudoers_mailfrom: "{{ sender_email }}"
+
+  vars_files:
+    - vars/users.yml.vault
+    - vars/tripwire.yml.vault
+
+  roles:
+
+    - role: fqdn
+      tags: fqdn
+
+    - role: sshd
+      tags: sshd
+
+    - role: dragonfly-mail-agent
+      tags: mta
+      when: "'mail-relays' not in group_names"
+
+    - role: fail2ban
+      tags: fail2ban
+
+    - role: vim
+      tags: vim
+
+    - role: users
+      tags: users
+
+    - role: tripwire
+      tags: tripwire
+
+

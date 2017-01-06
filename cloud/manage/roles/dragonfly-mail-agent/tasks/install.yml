@@ -1,0 +1,35 @@
+# vim:ft=ansible :
+#
+# Ansible role to install Dragonfly Mail Agent
+#
+
+---
+
+- name:     create temp directory for deb package
+  register: dma_temp
+
+  tempfile:
+    state:  directory
+    suffix: _{{ dma_package_name }}
+
+
+- name: copy deb package to remote
+
+  copy:
+    src:  "{{ dma_package_file }}"
+    dest: "{{ dma_temp.path  }}/{{ dma_package_file }}"
+
+
+- name: install deb package
+
+  shell: >
+    DEBIAN_FRONTEND=noninteractive
+    dpkg --force-confnew --install {{ dma_temp.path }}/{{ dma_package_file }}
+
+
+- name: remove temp directory
+
+  file:
+    path: "{{ dma_temp.path }}"
+    state: absent
+

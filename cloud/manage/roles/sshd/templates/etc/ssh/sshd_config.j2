@@ -1,12 +1,19 @@
+{{ ansible_managed | comment }}
+
 # Only SSH2
 Protocol 2
 
-# Standard Port
+# Standard Port and Listen
 Port 22
+AddressFamily any
+ListenAddress [::]:22
+ListenAddress 0.0.0.0:22
+
 
 # Allowed Host Keys
-HostKey /etc/ssh/ssh_host_rsa_key
-HostKey /etc/ssh/ssh_host_ed25519_key
+{% for o in sshd_host_key_types %}
+HostKey {{ sshd_path }}/ssh_host_{{ o.type }}_key
+{% endfor %}
 
 # Privilege Separation and Strict File Permissions
 UsePrivilegeSeparation yes
@@ -17,21 +24,28 @@ SyslogFacility AUTH
 LogLevel INFO
 
 # Client Authentication
-AllowGroups ssh-user
+{% if sshd_allow_groups_enabled %}
+AllowGroups{% for group in sshd_allow_groups %} {{ group }}{% endfor %}
+
+{% endif %}
+# TODO: move authorized keys to a root only location
 AuthorizedKeysFile %h/.ssh/authorized_keys
 ChallengeResponseAuthentication no
 HostbasedAuthentication no
-LoginGraceTime 120
+LoginGraceTime 10
+MaxAuthTries 2
+MaxSessions 10
+MaxStartups 2
 PasswordAuthentication no
 PermitEmptyPasswords no
-PermitRootLogin yes
+PermitRootLogin {{ sshd_permit_root_login }}
 PubkeyAuthentication yes
 UsePAM no
 
 # Algorithms
-Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-ripemd160-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,hmac-ripemd160,umac-128@openssh.com
+Ciphers {{ sshd_ciphers | join(',') }}
+KexAlgorithms {{ sshd_kex_algos | join(',') }}
+MACs {{ sshd_macs | join(',') }}
 
 # X11
 X11Forwarding no
@@ -50,3 +64,4 @@ Subsystem sftp /usr/lib/openssh/sftp-server
 ClientAliveInterval 120
 ClientAliveCountMax 2
 TCPKeepAlive yes
+

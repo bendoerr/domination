@@ -1,0 +1,32 @@
+---
+
+- name: ensure vim is installed
+  apt:
+    name: vim
+    state: latest
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+
+- name: ensure vim is the alterative set editor
+  alternatives:
+    name: editor
+    path: /usr/bin/vim.basic
+
+- name: copy pathogen and vim plugins
+  synchronize:
+    src: "files/{{ item }}"
+    dest: "/{{ item }}"
+    archive: no
+    recursive: yes
+    checksum: yes
+  with_items:
+    - etc/vim/autoload/
+    - etc/vim/bundles/
+
+- name: ensure vim is reasonably configured
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+  with_items:
+    - etc/vim/vimrc.local
+

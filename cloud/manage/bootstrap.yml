@@ -1,0 +1,34 @@
+#!/usr/bin/env ansible-playbook
+# vim:ft=ansible :
+#
+# Ansible playbook to bootstrap python
+#
+
+---
+
+- name:         bootstrap non python host
+  hosts:        "{{ target | default('all') }}"
+  gather_facts: no
+  remote_user:  root
+
+  tags:
+    - bootstrap
+
+  tasks:
+
+  - name:          check for python
+    register:      python_check
+    ignore_errors: yes
+
+    failed_when:  false
+    changed_when: python_check.rc != 0
+
+    raw: dpkg -s python-simplejson 2>&1 > /dev/null
+
+
+  - name: install python and simplejson
+
+    when: python_check | failed
+
+    raw: apt update && apt install -y python2.7 python-simplejson
+

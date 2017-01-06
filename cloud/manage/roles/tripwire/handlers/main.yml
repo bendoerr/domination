@@ -1,0 +1,44 @@
+---
+
+- name: set local-keyfile password
+
+  shell: >
+    rm /etc/tripwire/{{ inventory_hostname_short  }}-local.key
+    &&
+    twadmin --generate-keys \
+            --local-keyfile /etc/tripwire/{{ inventory_hostname_short  }}-local.key \
+            --local-passphrase  "{{ tripwire_local_password }}"
+
+
+- name: set site-keyfile password
+
+  shell: >
+    rm /etc/tripwire/site.key
+    &&
+    twadmin --generate-keys \
+            --site-keyfile /etc/tripwire/site.key \
+            --site-passphrase  "{{ tripwire_site_password }}"
+
+
+- name: generate tripwire config db
+
+  command: >
+    twadmin --create-cfgfile
+            --site-keyfile /etc/tripwire/site.key
+            --site-passphrase  "{{ tripwire_site_password }}"
+            /etc/tripwire/twcfg.txt
+
+
+- name: generate tripwire policy db
+
+  command: >
+    twadmin --create-polfile
+            --site-passphrase  "{{ tripwire_site_password }}"
+            /etc/tripwire/twpol.txt
+
+- name: init tripwire database
+
+  command: >
+    tripwire --init
+             --local-passphrase "{{ tripwire_local_password }}"
+
