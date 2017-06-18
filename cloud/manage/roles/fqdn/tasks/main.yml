@@ -1,16 +1,43 @@
+# vim:ft=ansible.yaml :
+#
+# A role that configures the server hostname and edits the hosts file to
+# include it mapped to the servers IP address.
+#
+
 ---
+
+# ------------------------------------------------------------------------------
+# Set the system hostname to the short hostname.
+
 - name: ensure hostname is set
-  hostname: name="{{ hostname }}"
+
+  hostname:
+    name: '{{ fqdn_short }}'
+
+
+# ------------------------------------------------------------------------------
+# If we changed the hostname we'll want to rebuild the host facts again to make
+# sure downstream tasks have the right value.
 
 - name: re-gather facts
+  when: ansible_hostname != fqdn_short
+
   action: setup
-  when: ansible_hostname != fqdn
+
+
+# ------------------------------------------------------------------------------
+# Make sure our hosts file has our own hostnames in it associated with our
+# public IP address.
 
 - name: build hosts file
-  lineinfile:
-    dest: /etc/hosts
-    regexp: '^{{ ansible_default_ipv4.address }}'
-    line: '{{ ansible_default_ipv4.address }} {{ fqdn }} {{ hostname }}'
-    state: present
-    backup: yes
   when: ansible_default_ipv4.address is defined
+
+  # TODO: consider if using a template would be a better approach
+  # TODO: support IPv6
+
+  lineinfile:
+    dest:   /etc/hosts
+    regexp: '^{{ ansible_default_ipv4.address }}'
+    line:   '{{ ansible_default_ipv4.address }} {{ fqdn_full }} {{ fqdn_short }}'
+    state:  present
+    backup: yes

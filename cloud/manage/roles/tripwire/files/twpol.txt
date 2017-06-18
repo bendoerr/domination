@@ -168,6 +168,6 @@ SIG_HI        = 100 ;               # Critical files that are
         /usr/bin                -> $(SEC_BIN) ;
 
         # Lib
-        /usr/local/lib  -> $(SEC_BIN) ;
-        /usr/lib        -> $(SEC_BIN) ;
+        /usr/local/lib          -> $(SEC_BIN) ;
+        /usr/lib                -> $(SEC_BIN) ;
 }

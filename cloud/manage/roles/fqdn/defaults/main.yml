@@ -1,3 +1,19 @@
 ---
-fqdn: "{{ inventory_hostname }}"
-hostname: "{{ inventory_hostname_short }}"
+
+# For better or worse default to the inventory names. If the inventory doesn't
+# define hostnames then you should define host_vars or another way. For example
+# when using the "Digital Ocean" inventory provider you need to set the
+# 'use_name' property to 'True' and the domain postix in the 'use_name_domain'
+# field otherwise the inventory will be populated with IP addresses.
+
+
+# ------------------------------------------------------------------------------
+# The full hostname of this server. For example "magic.server.example.com".
+
+fqdn_full: "{{ inventory_hostname }}"
+
+
+# ------------------------------------------------------------------------------
+# The short (usualy a single name) hostname of this server. For example "magic".
+
+fqdn_short: "{{ inventory_hostname_short }}"
