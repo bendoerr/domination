@@ -10,9 +10,14 @@ resource "digitalocean_record" "dmarc" {
     value = "v=DMARC1; p=none; rua=mailto:craftsman@bendoerr.me; rf=afrf; pct=100; ri=1800"
 }
 
-resource "digitalocean_record" "spf" {
-    domain = "cloud.bendoerr.com"
-    type = "TXT"
-    name = "@"
-    value = "v=spf1 a:cloud.bendoerr.com ip4:${digitalocean_droplet.gateway.ipv4_address} ~all"
+/*resource "digitalocean_record" "spf" {*/
+    /*domain = "cloud.bendoerr.com"*/
+    /*type = "TXT"*/
+    /*name = "@"*/
+    /*value = "v=spf1 a:cloud.bendoerr.com ip4:${digitalocean_droplet.gateway.ipv4_address} ~all"*/
+/*}*/
+
+resource "digitalocean_domain" "shadowcville_com" {
+    name = "shadowcville.com"
+    ip_address = "${digitalocean_droplet.discourse.ipv4_address}"
 }

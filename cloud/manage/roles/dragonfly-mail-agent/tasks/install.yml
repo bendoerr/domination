@@ -20,6 +20,18 @@
     dest: "{{ dma_temp.path  }}/{{ dma_package_file }}"
 
 
+- name: remove lsb-invalid-mta
+  package:
+    name:  lsb-invalid-mta
+    state: absent
+
+
+- name: remove postfix
+  package:
+    name:  postfix
+    state: absent
+
+
 - name: install deb package
 
   shell: >

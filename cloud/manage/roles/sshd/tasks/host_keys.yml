@@ -15,11 +15,9 @@
     label:      "{{ item.path | basename }}"
 
   when: |
-    {{
        sshd_host_key_force_regen
        or ( sshd_host_key_types | selectattr('file', 'equalto', ( item.path | basename | replace(sshd_host_key_marker_prefix, '') | replace('.pub', '')) ) | first ) is undefined
        or ( ( sshd_host_key_types | selectattr('file', 'equalto', ( item.path | basename | replace('.pub', '') ) ) | first ) is defined and not item.islnk )
-    }}
 
   file:
     path:  "{{ item.path }}"

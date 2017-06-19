@@ -52,4 +52,7 @@
     - role: tripwire
       tags: tripwire
 
+    - role: docker
+      tags: docker
+      when: "'docker-host' in group_names"
 

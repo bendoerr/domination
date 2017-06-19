@@ -8,8 +8,8 @@
 - name:     check if dma is installed
   register: dma_installed
 
-  failed_when:   "{{ dma_installed.rc > 1 }}"
-  changed_when:  "{{ dma_installed.rc == 1 }}"
+  failed_when:   dma_installed.rc > 1
+  changed_when:  dma_installed.rc == 1
   ignore_errors: yes
 
   command: dpkg --status {{ dma_package_name }}
@@ -18,7 +18,7 @@
   include: install.yml
   static:  no
 
-  when: "{{ dma_installed.rc == 1 }}"
+  when: dma_installed.rc == 1
 
 - name: configure dma
 

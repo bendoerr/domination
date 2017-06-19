@@ -42,7 +42,7 @@
   loop_control:
     label:      "{{ item.name }}"
 
-  when: "{{ item.createhome | default(true) }}"
+  when: item.createhome | default(true)
 
   file:
     group: "{{ item.group | default(omit) }}"

@@ -1,7 +1,7 @@
 ---
 
 - name: ensure allowed_groups exists
-  when: "{{ sshd_allow_groups_enabled  }}"
+  when: sshd_allow_groups_enabled
 
   with_items: "{{ sshd_allow_groups }}"
 
@@ -11,7 +11,7 @@
 
 
 - name: ensure root is in allowed_groups
-  when: "{{ sshd_allow_groups_enabled  }}"
+  when: sshd_allow_groups_enabled
 
   user:
     name:   root

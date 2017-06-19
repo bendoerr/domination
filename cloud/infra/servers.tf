@@ -27,6 +27,10 @@ resource "digitalocean_tag" "testing-servers" {
     name = "testing-servers"
 }
 
+resource "digitalocean_tag" "docker-host" {
+    name = "docker-host"
+}
+
 ################################################################################
 #
 # gateway.cloud.bendoerr.com
@@ -106,8 +110,8 @@ resource "digitalocean_droplet" "minecraft" {
 
     resize_disk = "false"
 
-    tags = [ "${digitalocean_tag.servers.id}"
-           , "${digitalocean_tag.minecraft-servers.id}"
+    tags = [ "${digitalocean_tag.minecraft-servers.id}"
+           , "${digitalocean_tag.servers.id}"
            ]
 
     connection {
@@ -133,6 +137,13 @@ resource "digitalocean_record" "minecraft_internal" {
     value = "${digitalocean_droplet.minecraft.ipv4_address_private}"
 }
 
+resource "digitalocean_record" "minecraft_spf" {
+    domain = "cloud.bendoerr.com"
+    type = "TXT"
+    name = "minecraft"
+    value = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+}
+
 ################################################################################
 #
 # minecraft-pe.cloud.bendoerr.com
@@ -154,8 +165,8 @@ resource "digitalocean_droplet" "minecraft-pe" {
 
     resize_disk = "false"
 
-    tags = [ "${digitalocean_tag.servers.id}"
-           , "${digitalocean_tag.minecraft-pe-servers.id}"
+    tags = [ "${digitalocean_tag.minecraft-pe-servers.id}"
+           , "${digitalocean_tag.servers.id}"
            ]
 
     connection {
@@ -179,6 +190,13 @@ resource "digitalocean_record" "minecraft-pe_internal" {
     type = "A"
     name = "minecraft-pe.internal"
     value = "${digitalocean_droplet.minecraft-pe.ipv4_address_private}"
+}
+
+resource "digitalocean_record" "minecraft-pe_spf" {
+    domain = "cloud.bendoerr.com"
+    type = "TXT"
+    name = "minecraft-pe"
+    value = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
 }
 
 ################################################################################
@@ -239,3 +257,66 @@ resource "digitalocean_record" "testing-01_internal" {
     value = "${digitalocean_droplet.testing-01.ipv4_address_private}"
 }
 */
+
+################################################################################
+#
+# discourse.cloud.bendoerr.com
+#
+
+resource "digitalocean_droplet" "discourse" {
+
+    image = "ubuntu-16-04-x64"
+    name = "discourse"
+    region = "nyc3"
+    size = "2gb"
+
+    backups = "false"
+    ipv6 = "false"
+    private_networking = true
+
+    ssh_keys = [
+        "${var.digitalocean_ssh_fingerprint}"
+    ]
+
+    resize_disk = "false"
+
+    tags = [ "${digitalocean_tag.servers.id}"
+           , "${digitalocean_tag.docker-host.id}"
+           ]
+
+    connection {
+        user = "root"
+        type = "ssh"
+        key_file = "${var.digitalocean_ssh_key}"
+        timeout = "2m"
+    }
+
+}
+
+resource "digitalocean_record" "discourse" {
+    domain = "cloud.bendoerr.com"
+    type = "A"
+    name = "discourse"
+    value = "${digitalocean_droplet.discourse.ipv4_address}"
+}
+
+resource "digitalocean_record" "discourse_internal" {
+    domain = "cloud.bendoerr.com"
+    type = "A"
+    name = "discourse.internal"
+    value = "${digitalocean_droplet.discourse.ipv4_address_private}"
+}
+
+resource "digitalocean_record" "discourse_spf" {
+    domain = "cloud.bendoerr.com"
+    type = "TXT"
+    name = "discourse"
+    value = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+}
+
+resource "digitalocean_record" "shadowcville_com_spf" {
+    domain = "shadowcville.com"
+    type = "TXT"
+    name = "@"
+    value = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+}

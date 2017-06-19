@@ -104,7 +104,6 @@ check_current_plan
 readonly out_state="$(new_state)"
 
 terraform apply \
-    -state="${CURRENT_STATE}" \
     -state-out="${out_state}" \
     -backup="-" \
     "${CURRENT_PLAN}"
