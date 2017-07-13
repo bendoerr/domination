@@ -1,0 +1,6 @@
+---
+
+host_certs_names:
+  - "{{ inventory_hostname }}"
+
+host_certs_admin_email: "admin@{{ inventory_hostname_short }}"

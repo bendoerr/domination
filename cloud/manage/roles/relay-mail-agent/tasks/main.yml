@@ -1,0 +1,95 @@
+---
+
+- name: install packages
+
+  with_items:
+    - postfix
+    - opendkim
+
+  apt:
+    cache_valid_time: "{{ apt_cache_valid_time | default(600)}}"
+    name:             "{{ item }}"
+    state:            latest
+    update_cache:     yes
+
+
+- name: ensure /etc/dkimkeys permissions
+
+  file:
+    mode: 0700
+    path: /etc/dkimkeys
+    owner: opendkim
+    group: opendkim
+
+
+- name: ensure dkim key is present
+
+  copy:
+    content: "{{ postfix_gateway_mta_dkim_private }}"
+    dest: "/etc/dkimkeys/{{ postfix_gateway_mta_dkim_selector }}.private"
+    mode: 0600
+    owner: opendkim
+    group: opendkim
+  
+  notify:
+    - restart opendkim
+    - restart postfix
+
+
+- name: ensure dkim public key is present
+
+  copy:
+    content: "{{ postfix_gateway_mta_dkim_public }}"
+    dest: "/etc/dkimkeys/{{ postfix_gateway_mta_dkim_selector }}.txt"
+    mode: 0600
+    owner: opendkim
+    group: opendkim
+
+
+- name: configure postfix
+
+  with_items:
+    - etc/default/opendkim
+    - etc/opendkim.conf
+    - etc/postfix/canonical_maps
+    - etc/postfix/header_checks
+    - etc/postfix/internal_hosts
+    - etc/postfix/main.cf
+    - etc/postfix/virtual_maps
+
+  template:
+    src:  "{{ item }}.j2"
+    dest: "/{{ item }}"
+    mode: "u=rw,go=r"
+
+  notify:
+    - restart opendkim
+    - restart postfix
+
+- name: ensure postfix chroot var/run
+
+  file:
+    path: /var/spool/postfix/var/run
+    state: directory
+    owner: postfix
+    group: root
+    recurse: yes
+
+- name: ensure postfix chroot opendkim dir
+
+  file:
+    path: /var/spool/postfix/var/run/opendkim
+    state: directory
+    owner: opendkim
+    group: opendkim
+
+- name: add postfix use to opendkim group
+
+  user:
+    name: postfix
+    groups: opendkim
+    append: yes
+
+  notify:
+    - restart opendkim
+    - restart postfix

@@ -1,0 +1,27 @@
+---
+- name: check if we're using the alternative SSH port
+
+  wait_for:
+    port:            "9922"
+    state:           "started"
+    host:            "{{ inventory_hostname }}"
+    connect_timeout: "5"
+    timeout:         "10"
+
+  delegate_to:   "localhost"
+  ignore_errors: "yes"
+  register:      obscure_ssh
+
+
+- name: set inventory ansible_port to alternative
+
+  set_fact:
+    ansible_port: "9922"
+
+  when:     obscure_ssh is defined and obscure_ssh.state is defined and eobscure_ssh.state == "started"
+
+
+- name: gather facts
+
+  action: setup
+

@@ -9,6 +9,7 @@
 - name: ensure that server is setup and hardened
   hosts: "{{ target | default('all') }}"
   remote_user: root
+  gather_facts: no
 
   vars:
     admins_email: craftsman@bendoerr.me
@@ -24,11 +25,17 @@
     users_sudoers_mailto:   "{{ admins_email }}"
     users_sudoers_mailfrom: "{{ sender_email }}"
 
+    host_certs_admin_email: "{{ admins_email }}"
+
   vars_files:
-    - vars/users.yml.vault
+    - vars/dkim.yml.vault
     - vars/tripwire.yml.vault
+    - vars/users.yml.vault
 
   roles:
+
+    - role: find_port
+      tags: always
 
     - role: fqdn
       tags: fqdn
@@ -36,9 +43,16 @@
     - role: sshd
       tags: sshd
 
+    - role: host_certs
+      tags: host_certs
+
     - role: dragonfly-mail-agent
       tags: mta
       when: "'mail-relays' not in group_names"
+
+    - role: relay-mail-agent
+      tags: mta
+      when: "'mail-relays' in group_names"
 
     - role: fail2ban
       tags: fail2ban
@@ -52,7 +66,9 @@
     - role: tripwire
       tags: tripwire
 
+    - role: do-agent
+      tags: do-agent
+
     - role: docker
       tags: docker
       when: "'docker-host' in group_names"
-

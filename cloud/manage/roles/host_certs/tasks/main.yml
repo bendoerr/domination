@@ -1,0 +1,70 @@
+---
+
+- name: ensure certbot requirements are installed
+
+  with_items:
+    - ca-certificates
+    - libssl-dev
+    - python-pip
+
+  apt:
+    cache_valid_time: "{{ apt_cache_valid_time | default(600)}}"
+    name:             "{{ item }}"
+    state:            latest
+    update_cache:     yes
+
+
+- name: upgrade pip
+
+  pip:
+    name:  pip
+    state: latest
+
+
+- name: install certbot
+
+  with_items:
+    - certbot
+    - certbot-dns-digitalocean
+
+  pip:
+    name:  "{{ item }}"
+    state: latest
+
+
+- name: install configs
+
+  with_items:
+    - etc/letsencrypt/do.ini
+
+  template:
+    src:  "{{ item }}.j2"
+    dest: "/{{ item }}"
+    mode: "u=rw,go="
+
+
+- name:     check for live certificate
+  register: host_certs_live_st
+
+  stat:
+    path: "/etc/letsencrypt/live/{{ host_certs_names[0] }}/cert.pem"
+
+- name: issue inital certificate
+  when: host_certs_live_st.stat.exists == False
+
+  shell: |
+    /usr/local/bin/certbot certonly \
+        --non-interactive \
+        --dns-digitalocean \
+        --dns-digitalocean-credentials /etc/letsencrypt/do.ini \
+        --agree-tos \
+        --domains {{ host_certs_names | join(',') }} \
+        --email {{ host_certs_admin_email }}
+
+
+- name: ensure cron will renew certificates
+
+  cron:
+    name:         "letsencrypt renew"
+    special_time: daily
+    job: "/usr/local/bin/certbot renew --dns-digitalocean --dns-digitalocean-credentials /etc/letsencrypt/do.ini"

@@ -10,8 +10,8 @@
 #
 
 resource "digitalocean_droplet" "gateway" {
-  # image = "ubuntu-16-04-x64"
-  image  = ""
+  image = "ubuntu-16-04-x64"
+  #image  = ""
   name   = "gateway"
   region = "nyc3"
   size   = "512mb"
@@ -20,7 +20,9 @@ resource "digitalocean_droplet" "gateway" {
   ipv6               = "false"
   private_networking = true
 
-  ssh_keys = []
+  ssh_keys = [
+    "${var.digitalocean_ssh_fingerprint}",
+  ]
 
   resize_disk = "false"
 
@@ -59,8 +61,8 @@ resource "digitalocean_droplet" "minecraft" {
   resize_disk = "false"
 
   tags = [
-    "${digitalocean_tag.minecraft-server.id}",
     "${digitalocean_tag.all-servers.id}",
+    "${digitalocean_tag.minecraft-server.id}",
   ]
 
   connection {
@@ -92,8 +94,8 @@ resource "digitalocean_droplet" "minecraft-pe" {
   resize_disk = "false"
 
   tags = [
-    "${digitalocean_tag.minecraft-pe-server.id}",
     "${digitalocean_tag.all-servers.id}",
+    "${digitalocean_tag.minecraft-pe-server.id}",
   ]
 
   connection {

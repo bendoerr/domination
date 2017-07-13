@@ -2,3 +2,7 @@
 
 dma_package_name: dma
 dma_package_file: dma_0.11-1~ubuntu16.04.1_amd64.deb
+
+dma_smarthost: localhost
+dma_mailname: localhost
+dma_masquerade: root@localhost

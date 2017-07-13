@@ -41,3 +41,13 @@
     line:   '{{ ansible_default_ipv4.address }} {{ fqdn_full }} {{ fqdn_short }}'
     state:  present
     backup: yes
+
+- name: build hosts file 2
+  when: ansible_default_ipv4.address is defined
+
+  lineinfile:
+    dest:   /etc/hosts
+    regexp: '^127.0.1.1'
+    line:   '127.0.1.1 {{ fqdn_full }} {{ fqdn_short }}'
+    state:  present
+    backup: yes

@@ -22,12 +22,18 @@
     - vars/secret.yml.vault
     - vars/tripwire.yml.vault
 
+  roles:
+
+    - role: find_port
+      tags: always
+
+
   tasks:
 
     - name: run report
       become: yes
       command: tripwire --check --email-report
-      when: "{{ tripwire_run_report | bool }}"
+      when: tripwire_run_report | bool
 
     - name:         find the latest report
       become:       yes
@@ -58,7 +64,7 @@
     - name:    update tripwire database
       become:  yes
 
-      when:    "{{ ( report_file.stdout_lines[1] | int ) > ( db_date.stdout_lines[0] | int )  }}"
+      when:    ( report_file.stdout_lines[1] | int ) > ( db_date.stdout_lines[0] | int )
 
       command: >
           tripwire --update

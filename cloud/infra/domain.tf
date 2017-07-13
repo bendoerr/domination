@@ -14,11 +14,36 @@ resource "digitalocean_domain" "cloud_bendoerr_com" {
   ip_address = ""
 }
 
+resource "digitalocean_record" "cloud_bendoerr_com" {
+  domain = "cloud.bendoerr.com"
+  type   = "A"
+  name   = "@"
+  value  = "${digitalocean_droplet.gateway.ipv4_address}"
+  ttl    = 600
+}
+
 resource "digitalocean_record" "dmarc" {
   domain = "cloud.bendoerr.com"
   type   = "TXT"
   name   = "_dmarc"
   value  = "v=DMARC1; p=none; rua=mailto:craftsman@bendoerr.me; rf=afrf; pct=100; ri=1800"
+  ttl    = 600
+}
+
+resource "digitalocean_record" "dkim" {
+  domain = "cloud.bendoerr.com"
+  type   = "TXT"
+  name   = "gateway._domainkey"
+  value  = "v=DKIM1; k=rsa; s=email; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCXwO+lgk2d3JlVcqRx3K5gsns5g5h2EBOTJztJwZICFM5kQSNv5tBZGduZRzkx74sdHZ3Jh59i9f1aZamMNg8VUiN/9V+eRMpvpFIiu403laNJ+1FQMNpS3+wdWheOvfWSH2dvxFRqtMaWUqnCwwQhg5EIjQQ6rNZjKz+I1Eaj9wIDAQAB"
+  ttl    = 600
+}
+
+resource "digitalocean_record" "spf" {
+  domain = "cloud.bendoerr.com"
+  type   = "TXT"
+  name   = "@"
+  value  = "v=spf1 a:cloud.bendoerr.com ~all"
+  ttl    = 600
 }
 
 ################################################################################
@@ -31,6 +56,7 @@ resource "digitalocean_record" "gateway" {
   type   = "A"
   name   = "gateway"
   value  = "${digitalocean_droplet.gateway.ipv4_address}"
+  ttl    = 600
 }
 
 resource "digitalocean_record" "gateway_internal" {
@@ -38,20 +64,7 @@ resource "digitalocean_record" "gateway_internal" {
   type   = "A"
   name   = "gateway.internal"
   value  = "${digitalocean_droplet.gateway.ipv4_address_private}"
-}
-
-resource "digitalocean_record" "gateway_dkim" {
-  domain = "cloud.bendoerr.com"
-  type   = "TXT"
-  name   = "gateway._domainkey"
-  value  = "v=DKIM1; k=rsa; g=*; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCtaB00DRKNNVXlAXGK7COCQYducPKap6pUxRoiT3NJWRMktXP/FCtza450yer6TuyLXOF9Xo92RkcSLJOfwboFVyRs4F0yy4ez0CpGW3GLkXnjUZP8Y2giifwQG57kWIWUKC2Nk3n+l7czOxPeD1RXHN5C5RdeKQpFKopl0iLoEwIDAQAB"
-}
-
-resource "digitalocean_record" "gateway_spf" {
-  domain = "cloud.bendoerr.com"
-  type   = "TXT"
-  name   = "gateway"
-  value  = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.com ~all"
+  ttl    = 600
 }
 
 ################################################################################
@@ -64,6 +77,7 @@ resource "digitalocean_record" "minecraft" {
   type   = "A"
   name   = "minecraft"
   value  = "${digitalocean_droplet.minecraft.ipv4_address}"
+  ttl    = 600
 }
 
 resource "digitalocean_record" "minecraft_internal" {
@@ -71,13 +85,7 @@ resource "digitalocean_record" "minecraft_internal" {
   type   = "A"
   name   = "minecraft.internal"
   value  = "${digitalocean_droplet.minecraft.ipv4_address_private}"
-}
-
-resource "digitalocean_record" "minecraft_spf" {
-  domain = "cloud.bendoerr.com"
-  type   = "TXT"
-  name   = "minecraft"
-  value  = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+  ttl    = 600
 }
 
 ################################################################################
@@ -90,6 +98,7 @@ resource "digitalocean_record" "minecraft-pe" {
   type   = "A"
   name   = "minecraft-pe"
   value  = "${digitalocean_droplet.minecraft-pe.ipv4_address}"
+  ttl    = 600
 }
 
 resource "digitalocean_record" "minecraft-pe_internal" {
@@ -97,13 +106,7 @@ resource "digitalocean_record" "minecraft-pe_internal" {
   type   = "A"
   name   = "minecraft-pe.internal"
   value  = "${digitalocean_droplet.minecraft-pe.ipv4_address_private}"
-}
-
-resource "digitalocean_record" "minecraft-pe_spf" {
-  domain = "cloud.bendoerr.com"
-  type   = "TXT"
-  name   = "minecraft-pe"
-  value  = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+  ttl    = 600
 }
 
 ################################################################################
@@ -116,6 +119,7 @@ resource "digitalocean_record" "discourse" {
   type   = "A"
   name   = "discourse"
   value  = "${digitalocean_droplet.discourse.ipv4_address}"
+  ttl    = 600
 }
 
 resource "digitalocean_record" "discourse_internal" {
@@ -123,13 +127,7 @@ resource "digitalocean_record" "discourse_internal" {
   type   = "A"
   name   = "discourse.internal"
   value  = "${digitalocean_droplet.discourse.ipv4_address_private}"
-}
-
-resource "digitalocean_record" "discourse_spf" {
-  domain = "cloud.bendoerr.com"
-  type   = "TXT"
-  name   = "discourse"
-  value  = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
+  ttl    = 600
 }
 
 ################################################################################
@@ -140,11 +138,4 @@ resource "digitalocean_record" "discourse_spf" {
 resource "digitalocean_domain" "shadowcville_com" {
   name       = "shadowcville.com"
   ip_address = "${digitalocean_droplet.discourse.ipv4_address}"
-}
-
-resource "digitalocean_record" "shadowcville_com_spf" {
-  domain = "shadowcville.com"
-  type   = "TXT"
-  name   = "@"
-  value  = "v=spf1 a a:gateway.cloud.bendoerr.com include:_spf.google.comm ~all"
 }

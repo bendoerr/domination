@@ -1,0 +1,3 @@
+{% for h in groups['all'] %}
+@{{ h.split('.') | first }}  {{ h | replace('.', '@', 1) }}
+{% endfor %}

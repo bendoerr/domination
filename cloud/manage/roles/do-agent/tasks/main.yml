@@ -1,0 +1,44 @@
+---
+
+- name: ensure do-agent requirements are installed
+
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+
+  apt:
+    cache_valid_time: "{{ apt_cache_valid_time | default(600)}}"
+    name:             "{{ item }}"
+    state:            latest
+    update_cache:     yes
+
+
+- name: add do-agent apt repository public key is installed
+
+  apt_key:
+    state: present
+    url:   "https://repos.sonar.digitalocean.com/sonar-agent.asc"
+
+
+- name: add do-agent apt repository
+
+  apt_repository:
+    filename:     digitalocean-agent.list
+    repo:         "deb https://repos.sonar.digitalocean.com/apt main main"
+    state:        present
+    update_cache: yes
+
+
+- name: install do-agent package
+
+  apt:
+    name:  do-agent
+    state: latest
+
+
+- name: ensure do-agent service is started and enabled
+
+  service:
+    enabled: true
+    name:    do-agent
+    state:   started

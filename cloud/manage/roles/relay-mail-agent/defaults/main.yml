@@ -1,0 +1,18 @@
+---
+
+postfix_gateway_mta_admin_email: "admin@{{ inventory_hostname }}"
+postfix_gateway_mta_hostname: "{{ inventory_hostname_short }}"
+postfix_gateway_mta_origin: "{{ inventory_hostname  }}"
+
+postfix_gateway_mta_tls_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
+postfix_gateway_mta_tls_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+
+postfix_gateway_mta_smtp_bind: 0.0.0.0
+postfix_gateway_mta_networks: 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+
+postfix_gateway_mta_inet_interfaces: all
+postfix_gateway_mta_inet_protocols: all
+
+postfix_gateway_mta_opendkim_socket: "local:/var/spool/postfix/var/run/opendkim/opendkim.sock"
+postfix_gateway_mta_opendkim_socket_dir: "/var/spool/postfix/var/run/opendkim"
+postfix_gateway_mta_opendkim_milter: "local:/var/run/opendkim/opendkim.sock"

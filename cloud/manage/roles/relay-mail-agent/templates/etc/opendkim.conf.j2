@@ -1,0 +1,27 @@
+{{ ansible_managed | comment }}
+
+# For more advanced options, see opendkim.conf(5) and/or
+# /usr/share/doc/opendkim/examples/opendkim.conf.sample.
+
+# Process Options
+AutoRestart             yes
+Background              yes
+UMask                   002
+
+# Logging
+LogWhy                  yes
+Syslog                  yes
+
+# Signing
+Domain                  {{ postfix_gateway_mta_origin }}
+InternalHosts           /etc/postfix/internal_hosts
+KeyFile                 /etc/dkimkeys/{{ postfix_gateway_mta_dkim_selector }}.private
+Selector                {{ postfix_gateway_mta_dkim_selector }}
+
+# Signing/Verification Behavior
+Canonicalization        relaxed/relaxed
+DNSTimeout              5
+Mode                    sv
+SignatureAlgorithm      rsa-sha256
+SubDomains              yes
+X-Header                no

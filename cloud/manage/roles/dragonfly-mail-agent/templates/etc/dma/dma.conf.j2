@@ -2,8 +2,6 @@
 
 # Your smarthost (also called relayhost).  Leave blank if you don't want
 # smarthost support.
-# NOTE: on Debian systems this is handled via debconf!
-# Please use dpkg-reconfigure dma to change this value.
 SMARTHOST {{ dma_smarthost }}
 
 # Use this SMTP port.  Most users will be fine with the default (25)
@@ -19,11 +17,11 @@ SMARTHOST {{ dma_smarthost }}
 #AUTHPATH /etc/dma/auth.conf
 
 # Uncomment if yout want TLS/SSL support
-#SECURETRANSFER
+SECURETRANSFER
 
 # Uncomment if you want STARTTLS support (only used in combination with
 # SECURETRANSFER)
-#STARTTLS
+STARTTLS
 
 # Uncomment if you have specified STARTTLS above and it should be allowed
 # to fail ("opportunistic TLS", use an encrypted connection when available
@@ -64,4 +62,4 @@ MAILNAME {{ dma_mailname }}
 MASQUERADE {{ dma_masquerade }}
 
 # Directly forward the mail to the SMARTHOST bypassing aliases and local delivery
-#NULLCLIENT
+NULLCLIENT
